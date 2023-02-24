@@ -89,6 +89,13 @@ class ProfilerDeepFacade
         return $info;
     }
 
+
+
+    public static function Clear(){
+        self::$currentPart = null;
+        self:: $parts = [];
+    }
+
     public static function Stop()
     {
         if (!self::$currentPart) return;
