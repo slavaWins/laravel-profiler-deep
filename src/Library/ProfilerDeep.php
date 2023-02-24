@@ -55,10 +55,10 @@ class ProfilerDeep
         $columLens = [];
         foreach ($data as $row) {
             foreach ($row as $K => $val) {
-                $columLens[$K] = max(strlen(($val)), $columLens[$K] ?? 0) +2;
+                $columLens[$K] = max(strlen(($val)), ($columLens[$K] ?? 0 )+2 ) ;
             }
         }
-//dd($columLens);
+
 
 
         $render = '';
