@@ -1,0 +1,28 @@
+{
+    "name": "slavawins/laravel-profiler-deep",
+    "description": "Expa",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "slavaWins",
+            "email": "email@example.com",
+            "homepage": "https://github.com/slavaWins/laravel-profiler-deep"
+        }
+    ],
+    "require": {
+        "php": "^7.3|^8.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ProfilerDeep\\Providers\\ProfilerDeepServiceProvider"
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "ProfilerDeep\\": "src"
+        }
+    }
+}
