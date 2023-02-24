@@ -14,16 +14,40 @@ class ProfilerDeepFacade
     private static $currentPart = null;
     public static $parts = [];
 
+    public static function ResultPartsSql(){
+        $info = '';
+
+
+        foreach (self:: $parts as $name => $part) {
+            $info.="\n\n" . $part['table'];
+        }
+
+
+        return $info;
+    }
+
+
     public static function ResultParts()
     {
         $info = '';
 
+        $table = [];
+        $table[] = [
+            'Time CPU',
+            'Time SQL',
+            'Part name',
+        ];
+
         foreach (self:: $parts as $name => $part) {
 
-            $info .= "\n";
-            $info .= round($part['timeCpu'], 2) . ' sec.';
-            $info .= "   " . $name;
+            $table[] = [
+                round($part['timeCpu'], 2) . ' sec.',
+                round($part['time'] / 1000, 4) . ' sec.',
+                $name,
+            ];
         }
+
+        $info = ProfilerDeep::ConsoleTableDraw($table);
 
         return $info;
     }
@@ -36,7 +60,7 @@ class ProfilerDeepFacade
         self::$deep->Stop();
 
 
-        self:: $parts[self::$currentPart] = self::$deep->Anlz();
+        self:: $parts[self::$currentPart] = self::$deep->Anlz(self::$currentPart);
 
         self::$deep = null;
         self::$currentPart = null;

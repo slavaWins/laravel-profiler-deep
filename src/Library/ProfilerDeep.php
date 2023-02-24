@@ -31,7 +31,21 @@ class ProfilerDeep
 
 
         $pl = str_repeat(' ', $p);
-        return $pl . $txt . $pl;
+        $res = $pl . $txt . $pl;
+
+        $resLen = mb_strlen($res);
+        if ($len > $resLen) $res .= str_repeat('B', $len - $resLen);
+
+        $lenDelete = $resLen - $len;
+        if ($lenDelete > 0) {
+            $res = mb_substr($res, 0, $resLen-1);
+            if($lenDelete>1) {
+             $res = mb_substr($res, 1);
+            }
+        }
+
+
+        return $res;
     }
 
     public static function ConsoleTableDraw($data)
@@ -39,7 +53,7 @@ class ProfilerDeep
         $columLens = [];
         foreach ($data as $row) {
             foreach ($row as $K => $val) {
-                $columLens[$K] = max(strlen(($val)), $columLens[$K] ?? 0);
+                $columLens[$K] = max(strlen(($val)), $columLens[$K] ?? 0) +2;
             }
         }
 //dd($columLens);
@@ -209,7 +223,7 @@ class ProfilerDeep
 
         $console = '**** PROFILLER RESULT: ' . $title . ' ****';
         $console .= "\nОбщее время CPU: " . round($this->timeStart, 4) . ' sec.   ';
-        $console .= "\nОбщее время SQL: " . round($response['time']/1000, 4) . ' sec.  or '.round($response['time'], 2).' msec.  ';
+        $console .= "\nОбщее время SQL: " . round($response['time'] / 1000, 4) . ' sec.  or ' . round($response['time'], 2) . ' msec.  ';
 
 
         $console .= "\nЗапросы по таблицам";
