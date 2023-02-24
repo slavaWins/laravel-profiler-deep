@@ -10,16 +10,23 @@ use Illuminate\Support\Facades\Route;
 class ProfilerDeepFacade
 {
 
-    private static ?ProfilerDeep $deep = null;
-    private static $currentPart = null;
-    public static $parts = [];
 
-    public static function ResultPartsSql(){
+    private static $currentPart = null;
+
+    /** @var ProfilerDeep[] $parts */
+    public static $parts = [];
+    public static $partsLoops = [];
+
+    public static function ResultPartsSql()
+    {
+
+        if (!env("PROFILER_DEEP_ENABLE")) return "Not property in env PROFILER_DEEP_ENABLE=true";
+
         $info = '';
 
-
         foreach (self:: $parts as $name => $part) {
-            $info.="\n\n" . $part['table'];
+            $data = $part->Anlz($name);
+            $info .= "\n\n" . $data['table'];
         }
 
 
@@ -29,20 +36,26 @@ class ProfilerDeepFacade
 
     public static function ResultParts()
     {
+
+        if (!env("PROFILER_DEEP_ENABLE")) return "Not property in env PROFILER_DEEP_ENABLE=true";
+
         $info = '';
 
         $table = [];
         $table[] = [
             'Time CPU',
             'Time SQL',
+            'Repeats',
             'Part name',
         ];
 
         foreach (self:: $parts as $name => $part) {
 
+            $data = $part->Anlz($name);
             $table[] = [
-                round($part['timeCpu'], 2) . ' sec.',
-                round($part['time'] / 1000, 4) . ' sec.',
+                round($data['timeCpu'], 2) . ' sec.',
+                round($data['time'] / 1000, 4) . ' sec.',
+                self::$partsLoops[$name],
                 $name,
             ];
         }
@@ -57,18 +70,16 @@ class ProfilerDeepFacade
         if (!self::$currentPart) return;
 
 
-        self::$deep->Stop();
+        self:: $parts[self::$currentPart]->Stop();
 
 
-        self:: $parts[self::$currentPart] = self::$deep->Anlz(self::$currentPart);
-
-        self::$deep = null;
         self::$currentPart = null;
     }
 
 
     public static function AddPart($name = '')
     {
+        if (!env("PROFILER_DEEP_ENABLE")) return;
 
         $fromClass = str_replace('.php', '', basename(debug_backtrace()[0]['file']));
         $fromLine = basename(debug_backtrace()[0]['line']);
@@ -79,13 +90,19 @@ class ProfilerDeepFacade
             self::Stop();
         }
 
-        if (!self::$deep) self::$deep = new ProfilerDeep();
-
-
         self::$currentPart = $name;
 
+        if (!isset(self:: $parts[self::$currentPart])) {
+            self:: $parts[self::$currentPart] = new ProfilerDeep();
+        }
+        self:: $parts[self::$currentPart]->Start();
 
-        self::$deep->Start();
+        if (isset(self::$partsLoops[$name])) {
+            self::$partsLoops[$name]++;
+        } else {
+            self::$partsLoops[$name] = 1;
+        }
+
 
     }
 }

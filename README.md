@@ -20,6 +20,14 @@ composer require slavawins/laravel-profiler-deep
 ### Оценка и сравнение нескольких участков кода. 
 Допустим вы хотите увидеть только конкертные участки кода, что бы понять какой выполняется медленнее.
 
+Env:
+
+```  
+PROFILER_DEEP_ENABLE=true
+```  
+
+Код в любом месте проекта:
+
 ```  
 ProfilerDeepFacade::AddPart("header");
 //yor slow shid code

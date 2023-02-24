@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 class ProfilerDeep
 {
 
+    public $timeCpuAmount = 0;
+
     private $timeStart = 0;
     private $enabled = false;
     public $list = [];
@@ -84,19 +86,25 @@ class ProfilerDeep
         return $render;
     }
 
+    private $listner;
+
     public function Start()
     {
         $this->timeStart = microtime(true);
 
         $this->enabled = true;
 
-        DB::listen(function ($query) {
-            if (!$this->enabled) return;
-            $this->list[] = [
-                'q' => $query->sql,
-                'time' => $query->time,
-            ];
-        });
+        if(!$this->listner) {
+            DB::listen(function ($query) {
+                if (!$this->enabled) return;
+                $this->list[] = [
+                    'q' => $query->sql,
+                    'time' => $query->time,
+                ];
+            });
+
+            $this->listner = true;
+        }
     }
 
 
@@ -190,7 +198,7 @@ class ProfilerDeep
 
         $response = [];
 
-        $response['timeCpu'] = $this->timeStart;
+        $response['timeCpu'] =$this->timeCpuAmount;
         $response['time'] = 0;
         foreach ($this->list as $Q) {
             $parse = self::ParseQ($Q['q']);
@@ -222,7 +230,7 @@ class ProfilerDeep
 
 
         $console = '**** PROFILLER RESULT: ' . $title . ' ****';
-        $console .= "\nОбщее время CPU: " . round($this->timeStart, 4) . ' sec.   ';
+        $console .= "\nОбщее время CPU: " . round( $response['timeCpu'], 4) . ' sec.   ';
         $console .= "\nОбщее время SQL: " . round($response['time'] / 1000, 4) . ' sec.  or ' . round($response['time'], 2) . ' msec.  ';
 
 
@@ -254,8 +262,14 @@ class ProfilerDeep
         if (!$this->enabled) return;
 
         $res = microtime(true) - $this->timeStart;
-        $this->timeStart = $res;
+
+        $this->timeCpuAmount+=$res;
+
+        $this->timeStart = null;
+
         $this->enabled = false;
     }
+
+
 
 }
