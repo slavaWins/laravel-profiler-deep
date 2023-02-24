@@ -17,10 +17,33 @@ class ProfilerDeepFacade
     public static $parts = [];
     public static $partsLoops = [];
 
+    public static function ResultPartsSqlFromAllParts()
+    {
+
+        if (!env("PROFILER_DEEP_ENABLE")) return "Not property in env PROFILER_DEEP_ENABLE=true";
+        self::Stop();
+
+        $info = '';
+
+
+        $deep = new ProfilerDeep();
+
+        foreach (self:: $parts as $name => $part) {
+            $deep->list = array_merge($deep->list, $part->list);
+            $deep->timeCpuAmount += $part->timeCpuAmount;
+        }
+
+        $data = $deep->Anlz($name);
+        $info .= "\n\n" . $data['table'];
+
+        return $info;
+    }
+
     public static function ResultPartsSql()
     {
 
         if (!env("PROFILER_DEEP_ENABLE")) return "Not property in env PROFILER_DEEP_ENABLE=true";
+        self::Stop();
 
         $info = '';
 
@@ -38,6 +61,7 @@ class ProfilerDeepFacade
     {
 
         if (!env("PROFILER_DEEP_ENABLE")) return "Not property in env PROFILER_DEEP_ENABLE=true";
+        self::Stop();
 
         $info = '';
 

@@ -178,3 +178,7 @@ ProfilerDeepFacade::Stop();
 dump(ProfilerDeepFacade::ResultParts());
 
 ```  
+
+
+#### ProfilerDeepFacade::ResultPartsSqlFromAllParts();
+Возвращает лог по всем партам. То есть суммированый лог.

@@ -218,6 +218,7 @@ class ProfilerDeep
             $anlzByTablesType[$key]['count'] += 1;
         }
 
+
         arsort($anlzByTablesType);
         arsort($anlzByType);
         arsort($anlzByTables);
@@ -251,6 +252,14 @@ class ProfilerDeep
         foreach ($anlzByType as $K => $V) $res[] = [$K, $V['count'], round($V['time'], 2) . ' ms'];
         $console .= " " . self::ConsoleTableDraw($res);
 
+
+        $console .= "\n\nСамые долгие:";
+        $listTop =  collect($this->list)->sort(function ($e){
+            return $e['time'];
+        })->reverse()->take(5);
+        foreach ($listTop as $K=>$V){
+            $console .= "\n" .  round($V['time'] / 1000, 4) . ' sec '. $V['q'];//.' '.$V['Q'];;
+        }
 
         $response['table'] = $console;
 
